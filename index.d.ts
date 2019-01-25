@@ -1,14 +1,17 @@
 import { Store } from "express-session";
 import { RequestHandler } from "express";
 import { IpcNetConnectOpts } from "net";
+import { Express } from "express";
+import * as next from "next";
+import { LuscaOptions } from "lusca";
+import { INextAuthSessionData } from "./client";
 
-declare namespace nextAuth {
-  interface IOptions {
-    bodyParser: boolean;
-    csrf: boolean;
-    pathPrefix: string;
+export  interface IOptions {
+    bodyParser?: boolean;
+    csrf?: boolean | LuscaOptions;
+    pathPrefix?: string;
     expressApp?: Express.Application;
-    expressSession: RequestHandler;
+    expressSession: any;
     sessionSecret: string;
     sessionStore: Store;
     sessionMaxAge: number;
@@ -43,17 +46,13 @@ declare namespace nextAuth {
     user?: UserType;
     expires?: number;
   }
-  interface IFunctions<
+
+  export  interface IFunctions<
     UserType = {},
     IDType = string,
     SessionType extends INextAuthSessionData = INextAuthSessionData
   > {
-    find(
-      id: IDType,
-      email: string,
-      emailToken: string,
-      provider: IUserProvider
-    ): Promise<UserType>;
+    find(opts: IFindParamsType<UserType, IDType, SessionType>): Promise<UserType>;
     update: (user: UserType, profile: any) => Promise<UserType>;
     insert: (user: UserType, profile: any) => Promise<UserType>;
     remove: (id: IDType) => Promise<boolean>;
@@ -81,4 +80,4 @@ declare function NextAuth(
   nextApp?: NextApp,
   options?: nextAuth.IOptions
 ): Promise<nextAuth.INextAuthResult>;
-export = NextAuth;
+
